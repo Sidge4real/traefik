@@ -4,7 +4,25 @@ services:
     ports:
       - "443:443"
       - "80:80"
-      - "8080:8080"
+      # - "8080:8080"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "./etc/traefik/traefik.yml:/etc/traefik/traefik.yml"
+      # permissies op acme aanpassen van 644 (standaard) naar 600 [lezen&schrijven op user niveau 6 | op groep niveau 0 | op everyone 0]
+      # chmod 600 acme.json
+      - "./acme.json:/acme.json"
+      # default generated name
+    networks:
+      - twitter-mean
+    container_name: traefik
+    labels:
+      - "traefik.http.routers.traefik.rule=Host(`traefik-dashboard.lukasvanderspiegel.be`)"
+      - "traefik.http.services.traefik.loadbalancer.server.port=8080" # we exposen via treafik
+      - "traefik.http.middlewares.strip-api-prefix.stripprefix.prefixes=/api"
+      - "traefik.http.routers.traefik.tls.certresolver=myresolver"
+
+networks:
+  default:
+    name: traefik
+  twitter-mean:
+    external: true

@@ -24,6 +24,11 @@ global:
 entryPoints:
   web:
     address: :80
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
 
   websecure:
     address: :443
@@ -148,3 +153,13 @@ providers:
 # Default: true
 #
 #    exposedByDefault: false
+
+
+certificatesResolvers:
+  myresolver:
+    acme:
+      email: vanderspiegel.lukas@gmail.com
+      storage: acme.json
+      httpChallenge:
+        # used during the challenge
+        entryPoint: web
